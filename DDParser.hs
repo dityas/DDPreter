@@ -2,12 +2,10 @@
 
 data DExpr = DSymbol String
     | DList [DExpr]
+    | DLParen
+    | DRParen
     deriving Show
 
 
-parseLine :: String -> (Int, String, String)
-parseLine "" = (0, "", "")
-parseLine _ = (-1, "", "")
+getTokensFromCLI = words <$> getLine
 
-parseLinePartial :: (Int, String, String) -> (Int, String, String)
-parseLinePartial (parens, "", other) = (parens, other, "")
