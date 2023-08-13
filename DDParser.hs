@@ -5,8 +5,6 @@ data DExpr = DSymbol String
     | DInt      Int
     | DFloat    Float
     | DList     [DExpr]
-    | DLParen
-    | DRParen
     deriving Show
 
 
@@ -23,10 +21,10 @@ parseSymbol = do
 
 
 parseInt :: Parser DExpr
---parseInt = do
---    num     <- many digit
---    return  (DInt (read num :: Int))
-parseInt = return (DInt (read many digit :: Int))
+parseInt = do
+    num     <- many digit
+    return  (DInt (read num :: Int))
+
 
 parseFloat :: Parser DExpr
 parseFloat = do
@@ -35,6 +33,12 @@ parseFloat = do
     rest    <- many digit
     let floatnum = num ++ "." ++ rest
     return  (DFloat (read floatnum :: Float))
+
+
+parseList :: Parser [DExpr]
+parseList = do
+    char '('
+
 
 
 parseNumber :: Parser DExpr
