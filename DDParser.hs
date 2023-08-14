@@ -1,4 +1,10 @@
-import Text.ParserCombinators.Parsec
+-- Bulk of this code is based on the Haskell Scheme tutorial
+-- Ref: https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours/Parsing
+--
+-- Update: I really hate the do notation. Feels a lot like any other language.
+-- So I'll try to avoid the do notation as far as possible.
+
+import Text.ParserCombinators.Parsec hiding (spaces)
 
 
 data DExpr = DSymbol String
@@ -8,46 +14,46 @@ data DExpr = DSymbol String
     deriving Show
 
 
-getTokensFromCLI = words <$> getLine
+spaces :: Parser ()
+spaces = skipMany1 space
+
+number = many1 digit
 
 
 -- Parse symbols (words). Start with a letter but may include digits
 parseSymbol :: Parser DExpr
-parseSymbol = do
-    first   <- letter
-    rest    <- many (letter <|> digit)
-    let symbol = first : rest
-    return (DSymbol symbol)
+parseSymbol = fmap DSymbol $ (:) <$> first <*> rest
+    where 
+        first   = letter
+        rest    = many (letter <|> digit)
 
 
 parseInt :: Parser DExpr
-parseInt = do
-    num     <- many digit
-    return  (DInt (read num :: Int))
+parseInt = (DInt . read) <$> number
 
 
 parseFloat :: Parser DExpr
-parseFloat = do
-    num     <- many digit
-    char '.'
-    rest    <- many digit
-    let floatnum = num ++ "." ++ rest
-    return  (DFloat (read floatnum :: Float))
+parseFloat = (DFloat . read) <$> ((++) <$> number <*> decimal)
+    where decimal = (:) <$> char '.' <*> number
 
-
-parseList :: Parser [DExpr]
+parseList :: Parser DExpr
 parseList = do
     char '('
+    list <- DList <$> sepBy parseExpr spaces
+    char ')'
+    return list
 
 
-
+-- Apparently Parsec does not backtrack by default. So I use try here. I have
+-- no idea how try does what it does though.
 parseNumber :: Parser DExpr
-parseNumber = parseInt <|> parseFloat
+parseNumber = try parseFloat <|> parseInt
 
 
 parseExpr :: Parser DExpr
 parseExpr = parseSymbol
     <|> parseNumber
+    <|> parseList
 
 
 parseLine :: String -> String
