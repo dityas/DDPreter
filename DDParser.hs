@@ -56,8 +56,8 @@ parseExpr = parseSymbol
     <|> parseList
 
 
-parseLine :: String -> String
+parseLine :: String -> DExpr
 parseLine input = case parse parseExpr "DDPreter" input of
-    Left err        -> "No match: " ++ show err
-    Right parsed    -> "Parsed everything"
+    Left err        -> DList $ [DSymbol "error", DSymbol $ show err]
+    Right parsed    -> parsed
 
