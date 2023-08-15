@@ -37,11 +37,12 @@ parseFloat = (DFloat . read) <$> ((++) <$> number <*> decimal)
     where decimal = (:) <$> char '.' <*> number
 
 parseList :: Parser DExpr
-parseList = do
-    char '('
-    list <- DList <$> sepBy parseExpr spaces
-    char ')'
-    return list
+--parseList = do
+--    char '('
+--    list <- DList <$> sepBy parseExpr spaces
+--    char ')'
+--    return list
+parseList = fmap DList $ char '(' *> (sepBy parseExpr spaces) <* char ')'
 
 
 -- Apparently Parsec does not backtrack by default. So I use try here. I have
