@@ -1,3 +1,4 @@
+module DDParser where
 -- Bulk of this code is based on the Haskell Scheme tutorial
 -- Ref: https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours/Parsing
 --
@@ -37,11 +38,6 @@ parseFloat = (DFloat . read) <$> ((++) <$> number <*> decimal)
     where decimal = (:) <$> char '.' <*> number
 
 parseList :: Parser DExpr
---parseList = do
---    char '('
---    list <- DList <$> sepBy parseExpr spaces
---    char ')'
---    return list
 parseList = fmap DList $ char '(' *> (sepBy parseExpr spaces) <* char ')'
 
 
