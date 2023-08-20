@@ -9,9 +9,6 @@ getPromptInput prompt = putStr prompt >> getLine
 -- valid to be parsed.
 --
 --
-getParsedLine :: IO String
-getParsedLine = getPromptInput ">> "
 
-
-replOnce :: IO String
-replOnce = getParsedLine
+replOnce :: IO DExpr
+replOnce = parseLine <$> getPromptInput ">> "
